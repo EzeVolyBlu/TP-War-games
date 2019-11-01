@@ -1,7 +1,3 @@
-org 100h
-
-;boorar las coordenadas alrededor de la coordenada ingresada
-
 org 100h  
 
 mov bl,4                            ;[fila]      
