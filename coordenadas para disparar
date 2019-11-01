@@ -1,0 +1,20 @@
+org 100h  
+
+mov bl,0 ;[fila]  
+mov al,76 ;multiplicamos por 76 (numero de columnas) que representa una fila
+mul bl     ; multiplicacion
+mov si,5     ;[columna]
+mov bx,ax    ;pasamos el resultado de la multiplicacion a bx
+mov mapaArriba[bx+si], ' '  ;tomamos la columna y la sumamos con la fila para reemplazarlo por " " 
+
+;para poder ver el mapa:
+mov ah,09
+mov dx,offset mapaArriba
+int 21h 
+ret 
+mapaArriba db "00..........................WAR GAMES -1983...............................",10,13,"01.......-.....:**:::*=-..-++++:............:--::=WWW***+-++-.............",10,13,"02...:=WWWWWWW=WWW=:::+:..::...--....:=+W==WWWWWWWWWWWWWWWWWWWWWWWW+-.....",10,13,"03..-....:WWWWWWWW=-=WW*.........--..+::+=WWWWWWWWWWWWWWWWWWWW:..:=.......",10,13,"04.......+WWWWWW*+WWW=-:-.........-+*=:::::=W*W=WWWW*++++++:+++=-.........",10,13,"05......*WWWWWWWWW=..............::..-:--+++::-++:::++++++++:--..-........",10,13,"06.......:**WW=*=...............-++++:::::-:+::++++++:++++++++............",10,13,"08........-+:...-..............:+++++::+:++-++::-.-++++::+:::-............",10,13,"09..........--:-...............::++:+++++++:-+:.....::...-+:...-..........",10,13,"$"    
+
+
+
+
+
