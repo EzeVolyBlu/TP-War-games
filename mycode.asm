@@ -5,7 +5,6 @@
 org 100h
 
 ;se imprme el mapa en dos partes
-;holakljkfbjksbfksbd
 mov bx,76
 mov cx,2
 add bx, cx
