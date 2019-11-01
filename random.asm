@@ -1,4 +1,5 @@
 
+
 ; You may customize this and other start-up templates; 
 ; The location of this template is c:\emu8086\inc\0_com_template.txt
 
@@ -13,14 +14,18 @@ inicio:
         inc dh
         
             
-        jpo IMPAR
+        jpo IMPAR 
+        
+        ;Union Sovietica
         
         PAR:
             mov dx, offset msg_par
             mov ah, 9 
             int 21h 
         
-            jmp END
+            jmp END 
+        
+        ;Estados Unidos
         
         IMPAR:      
         
@@ -34,8 +39,8 @@ inicio:
             ret           
         
 
-msg_par db 'Par$'
-msg_impar db 'Impar$'
+msg_par db 'ES EL TURNO PARA DISPARAR DE LA UNION SOVIETICA$'
+msg_impar db 'ES EL TURNO PARA DISPARAR DE ESTADOS UNIDOS$'
 
 
 proc prints
@@ -44,5 +49,3 @@ proc prints
     int 21h 
     
 endp
-
-
