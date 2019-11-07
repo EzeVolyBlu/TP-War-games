@@ -1,4 +1,3 @@
-  
 org 100h
 
 programaPrincipal:
@@ -21,7 +20,7 @@ proc jugar
                  
         call printMap
         call informarPaisTurno
-        ;call leerCoordenadas
+        call leerCoordenadas
         ;call disparar
         ;call informarResultado
         ;call actualizarSiguienteTurno
@@ -33,6 +32,15 @@ proc jugar
     ret
 endp    
 
+proc leerCoordenadas
+    
+    mov dx, offset URSS
+    call ingresarCoordenadas
+    
+    
+    ret
+endp    
+ 
 proc informarPaisTurno
     
     call clean_console
@@ -136,6 +144,7 @@ proc pedir_coordenadas_bases
     mov dx, offset URSS
     call print
     call establecerBase
+    ;call guardarBaseURSS
     
     call clean_console
     call cursor_bl_map              
@@ -146,6 +155,7 @@ proc pedir_coordenadas_bases
     mov dx, offset USA
     call print
     call establecerBase
+    ;call guardarBaseUSA
     
     
     ret
@@ -290,6 +300,54 @@ proc input_coordenada
     call sumar_segundodec
     
     mov coordenada, al
+    mov bl, coordenada
+    
+    cmp csa, 0
+    je INGRESAR_X_URSS
+    
+    cmp csa, 1
+    je INGRESAR_Y_URSS
+    
+    cmp csa, 2
+    je INGRESAR_X_USA
+    
+    cmp csa, 3
+    je INGRESAR_Y_USA
+    
+    jmp fin_ingreso
+    
+    INGRESAR_X_URSS:
+    
+        mov base_urss_x, bl
+        jmp fin_ingreso
+    
+    INGRESAR_Y_URSS:
+    
+        mov base_urss_y, bl
+        jmp fin_ingreso
+          
+    INGRESAR_X_USA:
+    
+        mov base_usa_x, bl
+        jmp fin_ingreso
+        
+    INGRESAR_Y_USA:
+    
+        mov base_usa_y, bl
+        jmp fin_ingreso
+    
+    fin_ingreso:
+    
+        inc csa   
+    
+    ;contador_super_aux = csa
+    
+    ;si es 0
+    ;mov base_urss_x, coordenada
+    ;inc contador
+    
+    ;si es 1
+    
      
     call input_teclado
     
@@ -299,6 +357,10 @@ proc input_coordenada
     jne CICLO
 ret         
 endp
+
+
+
+
 
 proc solo_numeros
     
@@ -372,3 +434,11 @@ msg_aux db ?
     
 aux db 10
 coordenada db ?
+
+csa db 0
+
+base_urss_x db ?
+base_urss_y db ?
+base_usa_x db ?
+base_usa_y db ?
+
