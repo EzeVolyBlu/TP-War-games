@@ -140,22 +140,21 @@ proc pedir_coordenadas_bases
 
     call cursor_bl_map       
     
-    ;call color_urss
+    
     mov dx, offset URSS
     call print
     call establecerBase
-    ;call guardarBaseURSS
+    
     
     call clean_console
     call cursor_bl_map              
             
     
-    ;call color_usa
     
     mov dx, offset USA
     call print
     call establecerBase
-    ;call guardarBaseUSA
+    
     
     
     ret
@@ -244,9 +243,6 @@ endp
         
         
 
-
-     
-
 proc establecerBase
     
     mov dx, offset pedir_coordenadas_base 
@@ -286,7 +282,16 @@ proc print
 endp
 
 
-
+proc coordenada_unica
+    
+    xor bh, bh
+    xor ah, ah
+    mov al, 76
+    mul bl
+    
+    
+    ret
+endp    
 
 proc input_coordenada
     
@@ -317,23 +322,33 @@ proc input_coordenada
     jmp fin_ingreso
     
     INGRESAR_X_URSS:
-    
-        mov base_urss_x, bl
+                   
+        xor bh, bh                  
+        
+        mov base_urss, bx
+        
         jmp fin_ingreso
     
     INGRESAR_Y_URSS:
-    
-        mov base_urss_y, bl
+                  
+        call coordenada_unica       
+        add base_urss, ax
+         
         jmp fin_ingreso
           
     INGRESAR_X_USA:
-    
-        mov base_usa_x, bl
+        
+        xor bh, bh
+        
+        mov base_usa, bx 
+        
         jmp fin_ingreso
         
     INGRESAR_Y_USA:
     
-        mov base_usa_y, bl
+        call coordenada_unica
+        add base_usa, ax
+        
         jmp fin_ingreso
     
     fin_ingreso:
@@ -437,8 +452,7 @@ coordenada db ?
 
 csa db 0
 
-base_urss_x db ?
-base_urss_y db ?
-base_usa_x db ?
-base_usa_y db ?
+
+base_urss dw ?
+base_usa dw ?
 
