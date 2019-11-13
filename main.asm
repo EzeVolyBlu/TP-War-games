@@ -34,8 +34,13 @@ endp
 
 proc leerCoordenadas
     
-    mov dx, offset URSS
+    
     call ingresarCoordenadas
+    
+    
+    
+    mov al, 4
+    
     
     
     ret
@@ -260,14 +265,22 @@ proc ingresarCoordenadas
     mov dx, offset pedir_coordenada_x
     call print    
     call input_coordenada
+                         
+    xor dh, dh
+    mov dl, coordenada
+    mov aux_disparo, dx
                   
     mov dx, offset pedir_coordenada_y
     call print    
-    call input_coordenada                  
+    call input_coordenada
+    
+    mov bl, coordenada
+    call mul_input_76
+    add aux_disparo, ax
+                      
                   
     
-ret        
-    
+    ret        
     
 endp         
      
@@ -282,7 +295,7 @@ proc print
 endp
 
 
-proc coordenada_unica
+proc mul_input_76
     
     xor bh, bh
     xor ah, ah
@@ -331,7 +344,7 @@ proc input_coordenada
     
     INGRESAR_Y_URSS:
                   
-        call coordenada_unica       
+        call mul_input_76 ;res en ax      
         add base_urss, ax
          
         jmp fin_ingreso
@@ -346,7 +359,7 @@ proc input_coordenada
         
     INGRESAR_Y_USA:
     
-        call coordenada_unica
+        call mul_input_76 ;res en ax
         add base_usa, ax
         
         jmp fin_ingreso
@@ -355,13 +368,7 @@ proc input_coordenada
     
         inc csa   
     
-    ;contador_super_aux = csa
     
-    ;si es 0
-    ;mov base_urss_x, coordenada
-    ;inc contador
-    
-    ;si es 1
     
      
     call input_teclado
@@ -455,4 +462,6 @@ csa db 0
 
 base_urss dw ?
 base_usa dw ?
+
+aux_disparo dw 0
 
