@@ -1,0 +1,68 @@
+    
+    
+org 100h
+         
+         
+    mov BX, 159   ;posicion en el texto
+    
+    MOV DX,175
+             
+CICLO:
+
+    cmp BX, DX      ;comparamos con el numero limite
+    je CONTADOR_FILAS        ;si es igual salimos
+    
+    
+    mov al, texto[BX]  ;usando bx de referencia pasamos a al nuestra letra
+    
+    
+    cmp al, 'W'         ;la comparamos con la w
+    je count_W           ;si es igual incrementamos el contador
+    jmp INCREMENTAR      ;saltamos a incrementar contadores
+    
+    
+    count_w:
+        inc cantidad_w    ;incrementamos contador de w
+                
+                
+                
+    INCREMENTAR:         
+    
+    inc BX                ;incre cx
+    jmp CICLO             ;volvemos al ciclo
+    
+    CONTADOR_FILAS: 
+    
+    CMP DX,555
+    JE SALIR
+    ADD DX,76 
+    ADD BX,59
+    JMP CICLO
+    
+    SALIR: 
+    MOV BX,41
+    MOV AX,cantidad_w
+    CMP AX,BX
+    JB TIRO_ACERTADO
+    
+    MOV AH,09H
+    MOV DX,OFFSET NO_ACERTO 
+    INT 21H
+    RET
+     
+    TIRO_ACERTADO:
+    MOV AH,09H
+    MOV DX,OFFSET ACERTO
+    INT 21H 
+    RET 
+
+ret
+
+                                    
+texto db "00..........................WAR GAMES -1983...............................",10,13,"01.......-.....:**:::*=-..-++++:............:--::=WWW***+-++-.............",10,13,"02...:=WWWWWWW=WWW=:::+:..::...--....:=+W==WWWWWWWWWWWWWWWWWWWWWWWW+-.....",10,13,"03..-....:WWWWWWWW=-=WW*.........--..+::+=WWWWWWWWWWWWWWWWWWWW:..:=.......",10,13,"04.......+WWWWWW*+WWW=-:-.........-+*=:::::=W*W=WWWW*++++++:+++=-.........",10,13,"05......*WWWWWWWWW=..............::..-:--+++::-++:::++++++++:--..-........",10,13,"06.......:**WW=*=...............-++++:::::-:+::++++++:++++++++............",10,13,"08........-+:...-..............:+++++::+:++-++::-.-++++::+:::-............",10,13,"09..........--:-...............::++:+++++++:-+:.....::...-+:...-..........",10,13,"$"
+cantidad_w db 0  
+ACERTO DB "ACERTO$" 
+NO_ACERTO DB "NO ACERTO$"
+
+
+;no funciona todavia porque en todos los casos acierta o no acierta en el mapa,dependiendo de lo cargado en tiro_acertado
