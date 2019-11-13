@@ -1,11 +1,13 @@
     
     
+    
 org 100h
          
          
     mov BX, 159   ;posicion en el texto
     
-    MOV DX,175
+    MOV DX,175   
+    
              
 CICLO:
 
@@ -34,7 +36,7 @@ CICLO:
     CONTADOR_FILAS: 
     
     CMP DX,555
-    JE SALIR
+    JB SALIR
     ADD DX,76 
     ADD BX,59
     JMP CICLO
@@ -56,13 +58,12 @@ CICLO:
     INT 21H 
     RET 
 
-ret
+
 
                                     
 texto db "00..........................WAR GAMES -1983...............................",10,13,"01.......-.....:**:::*=-..-++++:............:--::=WWW***+-++-.............",10,13,"02...:=WWWWWWW=WWW=:::+:..::...--....:=+W==WWWWWWWWWWWWWWWWWWWWWWWW+-.....",10,13,"03..-....:WWWWWWWW=-=WW*.........--..+::+=WWWWWWWWWWWWWWWWWWWW:..:=.......",10,13,"04.......+WWWWWW*+WWW=-:-.........-+*=:::::=W*W=WWWW*++++++:+++=-.........",10,13,"05......*WWWWWWWWW=..............::..-:--+++::-++:::++++++++:--..-........",10,13,"06.......:**WW=*=...............-++++:::::-:+::++++++:++++++++............",10,13,"08........-+:...-..............:+++++::+:++-++::-.-++++::+:::-............",10,13,"09..........--:-...............::++:+++++++:-+:.....::...-+:...-..........",10,13,"$"
-cantidad_w db 0  
+cantidad_w dw 0  
 ACERTO DB "ACERTO$" 
 NO_ACERTO DB "NO ACERTO$"
 
 
-;no funciona todavia porque en todos los casos acierta o no acierta en el mapa,dependiendo de lo cargado en tiro_acertado
