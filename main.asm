@@ -228,12 +228,6 @@ endp
 
 
 proc printMap
-    
-;se imprme el mapa en dos partes
-mov bx,76
-mov cx,2
-add bx, cx
-mov mapaArriba [bx],"z"
 
 IMPRIMIR:
     
