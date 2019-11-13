@@ -8,7 +8,6 @@ programaPrincipal:
     ;call guardarRanking
     
   
-    end_game:
     
 ret
 
@@ -70,7 +69,7 @@ proc disparar
         call print_winner          
         mov dx, offset msg_usa_ganador
         call print
-        jmp end_game 
+        ;jmp end_game 
         
            
     URSS_WIN:     
@@ -78,7 +77,7 @@ proc disparar
         call print_winner          
         mov dx, offset msg_urss_ganador
         call print
-        jmp end_game 
+        ;jmp end_game 
         
     end_disparar:   
     
