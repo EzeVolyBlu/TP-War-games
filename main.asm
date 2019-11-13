@@ -7,8 +7,16 @@ programaPrincipal:
     call jugar
     ;call guardarRanking
     
+  
+    end_game:
     
 ret
+
+
+
+
+
+
 
 
 ;PROC
@@ -21,7 +29,7 @@ proc jugar
         call printMap
         call informarPaisTurno
         call leerCoordenadas
-        ;call disparar
+        call disparar
         ;call informarResultado
         ;call actualizarSiguienteTurno
         inc turno
@@ -32,17 +40,71 @@ proc jugar
     ret
 endp    
 
-proc leerCoordenadas
+proc print_winner
+    
+    call clean_console
+    call cursor_bl_map
+    xor dx, dx
+       
+    
+    ret
+endp    
+
+proc disparar
+    
+     
+    xor dx, dx
+    mov bx, aux_disparo        
+    cmp base_urss, bx
+    je USA_WIN
     
     
-    call ingresarCoordenadas
+    cmp base_usa, bx
+    je URSS_WIN
+    
+    jmp end_disparar
+    
+           
+    USA_WIN:  
+           
+        call print_winner          
+        mov dx, offset msg_usa_ganador
+        call print
+        jmp end_game 
+        
+           
+    URSS_WIN:     
+    
+        call print_winner          
+        mov dx, offset msg_urss_ganador
+        call print
+        jmp end_game 
+        
+    end_disparar:   
+    
+    ret
+endp    
+
+
+proc leerCoordenadas 
+    
+    mov dx, offset pedir_coordenada_x
+    call print    
+    call input_coordenada
+                         
+    call coordenada_unica
     
     
     
-    mov al, 4
+                  
+    mov dx, offset pedir_coordenada_y
+    call print    
+    call input_coordenada
     
-    
-    
+    mov bl, coordenada
+    call mul_input_76
+    add aux_disparo, ax
+       
     ret
 endp    
  
@@ -252,37 +314,22 @@ proc establecerBase
     
     mov dx, offset pedir_coordenadas_base 
     call print
-    call ingresarCoordenadas
+    call leerCoordenadas
 ret
          
 endp
      
-     
+proc coordenada_unica
+    
+        xor dh, dh
+        mov dl, coordenada
+        mov aux_disparo, dx
+    
+        ret
+endp      
 
      
-proc ingresarCoordenadas
-    
-    mov dx, offset pedir_coordenada_x
-    call print    
-    call input_coordenada
-                         
-    xor dh, dh
-    mov dl, coordenada
-    mov aux_disparo, dx
-                  
-    mov dx, offset pedir_coordenada_y
-    call print    
-    call input_coordenada
-    
-    mov bl, coordenada
-    call mul_input_76
-    add aux_disparo, ax
-                      
-                  
-    
-    ret        
-    
-endp         
+        
      
 
 proc print
@@ -371,11 +418,11 @@ proc input_coordenada
     
     
      
-    call input_teclado
+    call input_teclado ; carga el valor en al
     
     
     
-    cmp al, 013
+    cmp al, 013   ; si es 13 --> enter 
     jne CICLO
 ret         
 endp
@@ -442,6 +489,11 @@ pedir_coordenada_x db '',10,13,'Ingrese coordenada x: $'
 pedir_coordenada_y db '',10,13,'Ingrese coordenada y: $'
 mapaArriba db "00..........................WAR GAMES -1983..............................",10,13,"01.......-.....:**:::*=-..-++++:............:--::=WWW***+-++-.............",10,13,"02...:=WWWWWWW=WWW=:::+:..::...--....:=+W==WWWWWWWWWWWWWWWWWWWWWWWW+-.....",10,13,"03..-....:WWWWWWWW=-=WW*.........--..+::+=WWWWWWWWWWWWWWWWWWWW:..:=.......",10,13,"04.......+WWWWWW*+WWW=-:-.........-+*=:::::=W*W=WWWW*++++++:+++=-.........",10,13,"05......*WWWWWWWWW=..............::..-:--+++::-++:::++++++++:--..-........",10,13,"06.......:**WW=*=...............-++++:::::-:+::++++++:++++++++............",10,13,"08........-+:...-..............:+++++::+:++-++::-.-++++::+:::-............",10,13,"09..........--:-...............::++:+++++++:-+:.....::...-+:...-..........",10,13,"$"
 mapaAbajo db "10..............-+++:-..........:+::+::++++++:-......-....-...---.........",10,13,"11..............:::++++:-............::+++:+:.............:--+--.-........",10,13,"12..............-+++++++++:...........+:+::+................--.....---....",10,13,"13................:++++++:...........-+::+::.:-................-++:-:.....",10,13,"14.................++::+-.............::++:..:...............++++++++-....",10,13,"15.................:++:-...............::-..................-+:--:++:.....",10,13,"16.................:+-............................................-.....--",10,13,"17.................:....................................................--",10,13,"18.......UNITED STATES.........................SOVIET UNION...............$"
+
+
+msg_usa_ganador db 'USA ganador$'
+msg_urss_ganador db 'URSS ganador$'
+
 
 msg_start_urss db 'Empieza disparando URSS$'
 msg_start_usa db 'Empieza disparando USA$'
