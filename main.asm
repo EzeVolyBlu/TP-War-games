@@ -51,9 +51,72 @@ endp
 
 proc disparar
     
-     
-    xor dx, dx
-    mov bx, aux_disparo        
+    xor bx, bx
+    mov bx, aux_disparo 
+    xor dh, dh   ; filas
+    
+    sub bx, 77 
+    
+    
+    ciclo_filas:
+    
+        xor dl, dl   ; columnas    
+        ciclo_columnas:
+        
+            call check_bases
+            call count_w
+            call remove_w
+            
+            
+            cmp dl, 2
+            je end_ciclo_columnas
+            
+            inc bx
+            inc dl
+            jmp ciclo_columnas
+            
+        end_ciclo_columnas:    
+                                     
+        
+        cmp dh, 2
+        je end_ciclo_filas
+        
+        add bx, 74       
+        inc dh;
+        jmp ciclo_filas
+    
+    end_ciclo_filas:   
+
+    ret
+endp
+         
+proc remove_w
+    
+    mov mapaArriba[bx], " "
+    
+    ret
+endp             
+         
+         
+proc count_w
+    
+    cmp bx, 'w'
+    je inc_w
+    
+    jmp end_count_w
+
+    inc_w:      
+    
+        inc cant_w   
+
+    end_count_w:
+
+    ret
+endp    
+
+
+proc check_bases
+    
     cmp base_urss, bx
     je USA_WIN
     
@@ -61,25 +124,20 @@ proc disparar
     cmp base_usa, bx
     je URSS_WIN
     
-    jmp end_disparar
+    jmp end_check_bases
     
            
     USA_WIN:  
-           
-        call print_winner          
-        mov dx, offset msg_usa_ganador
-        call print
-        ;jmp end_game 
-        
-           
-    URSS_WIN:     
     
-        call print_winner          
-        mov dx, offset msg_urss_ganador
-        call print
-        ;jmp end_game 
+        inc usa_win_f
+        ; seguir proc
+        jmp end_check_bases       
+                   
+    URSS_WIN:     
         
-    end_disparar:   
+        inc urss_win_f
+        ; seguir proc
+    end_check_bases:   
     
     ret
 endp    
@@ -504,9 +562,13 @@ coordenada db ?
 
 csa db 0
 
+usa_win_f db 0
+urss_win_f db 0
+
 
 base_urss dw ?
 base_usa dw ?
 
 aux_disparo dw 0
 
+cant_w db 0
