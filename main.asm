@@ -11,14 +11,21 @@ programaPrincipal:
     
 ret
 
+;       PROC
+;------------------------
+
+proc initJuego 
+    
+    call printMap
+    call pedir_coordenadas_bases
+    call elegir_turno
+    call informar_quien_empieza
+    
+    ret
+endp    
 
 
 
-
-
-
-
-;PROC
 
 proc jugar
                  
@@ -29,7 +36,7 @@ proc jugar
         call informarPaisTurno
         call leerCoordenadas
         call disparar
-        ;call informarResultado
+        call informarResultado
         ;call actualizarSiguienteTurno
         inc turno
         
@@ -37,17 +44,28 @@ proc jugar
         jmp INICIO
     
     ret
-endp    
+endp
 
-proc print_winner
+proc informarResultado
     
-    call clean_console
-    call cursor_bl_map
-    xor dx, dx
-       
+    ;call clean_console
     
-    ret
-endp    
+    MOV DH,25 ; Cursor en el renglon 00
+    MOV DL,00 ; Cursor en la columna 19
+    call mov_cursor
+    
+    ;mov dx, offset urss_w
+    mov dx, offset msg_informar_resultado
+    
+    call print    
+    
+    
+    
+    
+
+     ret
+endp     
+
 
 proc disparar
     
@@ -149,11 +167,24 @@ endp
 
 proc leerCoordenadas 
     
+    start_leer_coor:
+    
+    mov out_of_range, 0
+    
     mov dx, offset msg_pedir_coordenada_x
-    call print    
+    call print
+        
+    ;este es 
     call input_coordenada
+    
+    
     mov coordenada_x, bl                        
     call coordenada_unica
+    
+    cmp out_of_range, 1
+    
+    je start_leer_coor:
+    
     
     
     
@@ -172,7 +203,10 @@ endp
 proc informarPaisTurno
     
     call clean_console
-    call cursor_bl_map
+    
+    MOV DH,19 ; Cursor en el renglon 00
+    MOV DL,00 ; Cursor en la columna 19
+    call mov_cursor
     
     call revisa_paridad
     cmp ah, 0
@@ -203,17 +237,6 @@ proc informarPaisTurno
         ret
 endp
 
-
-proc initJuego 
-    
-    call printMap
-    call pedir_coordenadas_bases
-    call elegir_turno
-    call informar_quien_empieza
-    
-    ret
-    
-endp    
 proc revisa_paridad
     
     xor ax, ax    
@@ -236,7 +259,10 @@ endp
 proc informar_quien_empieza
     
     call clean_console
-    call cursor_bl_map  
+    
+    MOV DH,19 ; Cursor en el renglon 00
+    MOV DL,00 ; Cursor en la columna 19
+    call mov_cursor
     
     
     call revisa_paridad ; param turno; resto = ah
@@ -265,35 +291,55 @@ endp
    
 
 proc pedir_coordenadas_bases
+    
+    establecer_base_urss:
+        
+        MOV DH,19 ; Cursor en el renglon 00
+        MOV DL,00 ; Cursor en la columna 19
+        call mov_cursor
+        
+        
+        mov dx, offset URSS
+        call print
+        call establecerBase
+        
+    
+    establecer_base_usa:
+    
+        call clean_console
+    
+        MOV DH,19 ; Cursor en el renglon 00
+        MOV DL,00 ; Cursor en la columna 19
+        call mov_cursor
+                
+        
+        
+        mov dx, offset USA
+        call print
+        call establecerBase
+        
+   ret
+endp
 
-    call cursor_bl_map       
+proc establecerBase
     
-    
-    mov dx, offset URSS
+    mov dx, offset msg_pedir_coordenadas_base 
     call print
-    call establecerBase
-    
-    
-    call clean_console
-    call cursor_bl_map              
-            
-    
-    
-    mov dx, offset USA
-    call print
-    call establecerBase
-    
-    
+    call leerCoordenadas
     
     ret
-endp         
+endp
+
 
 
 proc printMap
 
 IMPRIMIR:
+ 
+    mov dh, 00 ; Cursor en el renglon 00
+    mov dl, 00 ; Cursor en la columna 00   
+    call mov_cursor
     
-    call cursor_top
     mov dx,offset mapaArriba
     call print
     mov dx, offset mapaAbajo
@@ -326,29 +372,15 @@ proc color_urss
     ret
 endp         
 
-proc cursor_top       
-        
+
+proc mov_cursor
+    
     MOV AH,02H ; Peticion para colocar el cursor
     MOV BH,00 ; Nunmero de pagina a imprimir
-    MOV DH,00 ; Cursor en el renglon 00
-    MOV DL,00 ; Cursor en la columna 00
     INT 10H ; Interrupcion al bios
-    ret
-endp               
-
-
-
-
     
-proc cursor_bl_map       
-        
-        MOV AH,02H ; Peticion para colocar el cursor
-        MOV BH,00 ; Nunmero de pagina a imprimir
-        MOV DH,19 ; Cursor en el renglon 00
-        MOV DL,00 ; Cursor en la columna 00
-        INT 10H ; Interrupcion al bios
-        ret
-    endp               
+    ret
+endp
     
 proc clean_console
     
@@ -363,17 +395,6 @@ proc clean_console
     ret
 endp        
         
-        
-
-proc establecerBase
-    
-    mov dx, offset msg_pedir_coordenadas_base 
-    call print
-    call leerCoordenadas
-ret
-         
-endp
-     
 proc coordenada_unica
     
         xor dh, dh
@@ -418,6 +439,7 @@ proc input_coordenada
     call input_teclado
     call solo_numeros
     call sumar_segundodec
+    
     
     mov coordenada, al
     mov bl, coordenada
@@ -479,10 +501,57 @@ proc input_coordenada
      
     call input_teclado ; carga el valor en al
     
-    
-    
     cmp al, 013   ; si es 13 --> enter 
     jne CICLO
+    
+    cmp csa, 1
+    je check_coordenada_urss
+    
+    cmp csa, 3
+    je check_coordenada_usa
+    
+    jmp ok
+    
+    check_coordenada_urss:
+    
+        cmp coordenada, 33
+        jl et_out_of_range
+        
+        cmp coordenada, 76
+        jg et_out_of_range
+                  
+        jmp ok
+    
+    check_coordenada_usa:
+    
+        cmp coordenada, 33
+        jg et_out_of_range   
+        
+        jmp ok
+        
+        
+    et_out_of_range:
+ 
+        inc out_of_range
+        dec csa   
+        call clean_console
+    
+        MOV DH,19 ; Cursor en el renglon 00
+        MOV DL,00 ; Cursor en la columna 19
+        call mov_cursor
+        
+        mov dx, offset msg_out_of_range
+        call print
+    
+        ciclo_enter:       
+        
+            call input_teclado ; carga el valor en al
+            cmp al, 013   ; si es 13 --> enter  
+            jne ciclo_enter
+            
+    
+    ok:   
+    
 ret         
 endp
 
@@ -540,39 +609,30 @@ endp
          
 URSS db 'URSS$'
 USA db 'USA$'
-iniciar_juego db 'Iniciar juego$'
 msg_pedir_coordenadas_base db '',10,13,'Ingrese la ubicacion de su base secreta$'
 msg_pedir_coordenada_x db '',10,13,'Ingrese coordenada x: $'
 msg_pedir_coordenada_y db '',10,13,'Ingrese coordenada y: $'
+msg_start_urss db 'Empieza disparando URSS$'
+msg_start_usa db 'Empieza disparando USA$'
+msg_turno_urss db 'turno de URSS$'
+msg_turno_usa db 'turno de USA$'
+msg_resultados db 'Resultado$'
+msg_out_of_range db 'Fuera de rango$'
+
+
 mapaArriba db "00..........................WAR GAMES -1983...............................",10,13,"01.......-.....:**:::*=-..-++++:............:--::=WWW***+-++-.............",10,13,"02...:=WWWWWWW=WWW=:::+:..::...--....:=+W==WWWWWWWWWWWWWWWWWWWWWWWW+-.....",10,13,"03..-....:WWWWWWWW=-=WW*.........--..+::+=WWWWWWWWWWWWWWWWWWWW:..:=.......",10,13,"04.......+WWWWWW*+WWW=-:-.........-+*=:::::=W*W=WWWW*++++++:+++=-.........",10,13,"05......*WWWWWWWWW=..............::..-:--+++::-++:::++++++++:--..-........",10,13,"06.......:**WW=*=...............-++++:::::-:+::++++++:++++++++............",10,13,"08........-+:...-..............:+++++::+:++-++::-.-++++::+:::-............",10,13,"09..........--:-...............::++:+++++++:-+:.....::...-+:...-..........",10,13,"$"
 mapaAbajo db "10..............-+++:-..........:+::+::++++++:-......-....-...---.........",10,13,"11..............:::++++:-............::+++:+:.............:--+--.-........",10,13,"12..............-+++++++++:...........+:+::+................--.....---....",10,13,"13................:++++++:...........-+::+::.:-................-++:-:.....",10,13,"14.................++::+-.............::++:..:...............++++++++-....",10,13,"15.................:++:-...............::-..................-+:--:++:.....",10,13,"16.................:+-............................................-.....--",10,13,"17.................:....................................................--",10,13,"18.......UNITED STATES.........................SOVIET UNION...............$"
 
 
-msg_usa_ganador db 'USA ganador$'
-msg_urss_ganador db 'URSS ganador$'
-
-
-msg_start_urss db 'Empieza disparando URSS$'
-msg_start_usa db 'Empieza disparando USA$'
-
-msg_turno_urss db 'turno de URSS$'
-msg_turno_usa db 'turno de USA$'
-
 turno db ?
-               
-msg_aux db ?               
-
-    
 aux db 10
 coordenada db ?
-
 csa db 0
-
 base_urss dw ?
 base_usa dw ?
-
 aux_disparo dw 0
-
 urss_w db 40
 usa_w db 40    
 coordenada_x db 0
+out_of_range db 0
+msg_informar_resultado db 'informar resultado$'
