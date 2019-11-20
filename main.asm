@@ -64,7 +64,7 @@ proc disparar
         ciclo_columnas:
         
             call check_bases
-            call count_w
+            call check_w
             call remove_w
             
             
@@ -98,17 +98,23 @@ proc remove_w
 endp             
          
          
-proc count_w
+proc check_w
     
-    cmp bx, 'w'
-    je inc_w
+    cmp mapaArriba[bx], 'W'
+    jne end_count_w
     
-    jmp end_count_w
-
-    inc_w:      
+    cmp coordenada_x, 30
+    jl sub_usa_w
     
-        inc cant_w   
-
+        sub_urss_w:
+        
+            dec urss_w 
+            jmp end_count_w
+            
+        sub_usa_w:
+        
+            dec usa_w 
+        
     end_count_w:
 
     ret
@@ -118,25 +124,23 @@ endp
 proc check_bases
     
     cmp base_urss, bx
-    je USA_WIN
+    je destroy_urss_base
     
     
     cmp base_usa, bx
-    je URSS_WIN
+    je destroy_usa_base
     
     jmp end_check_bases
     
-           
-    USA_WIN:  
+    destroy_urss_base:
     
-        inc usa_win_f
-        ; seguir proc
-        jmp end_check_bases       
-                   
-    URSS_WIN:     
+        mov base_urss, -1
+        jmp end_check_bases
         
-        inc urss_win_f
-        ; seguir proc
+    destroy_usa_base:       
+        
+        mov base_usa, -1
+        
     end_check_bases:   
     
     ret
@@ -145,16 +149,16 @@ endp
 
 proc leerCoordenadas 
     
-    mov dx, offset pedir_coordenada_x
+    mov dx, offset msg_pedir_coordenada_x
     call print    
     call input_coordenada
-                         
+    mov coordenada_x, bl                        
     call coordenada_unica
     
     
     
                   
-    mov dx, offset pedir_coordenada_y
+    mov dx, offset msg_pedir_coordenada_y
     call print    
     call input_coordenada
     
@@ -363,7 +367,7 @@ endp
 
 proc establecerBase
     
-    mov dx, offset pedir_coordenadas_base 
+    mov dx, offset msg_pedir_coordenadas_base 
     call print
     call leerCoordenadas
 ret
@@ -417,6 +421,10 @@ proc input_coordenada
     
     mov coordenada, al
     mov bl, coordenada
+    
+    cmp csa, 3
+    
+    jg fin_ingreso
     
     cmp csa, 0
     je INGRESAR_X_URSS
@@ -526,8 +534,6 @@ proc sumar_segundodec
     sub al,48d
     add al,bl
     
-    
-    
     ret
     
 endp    
@@ -535,10 +541,10 @@ endp
 URSS db 'URSS$'
 USA db 'USA$'
 iniciar_juego db 'Iniciar juego$'
-pedir_coordenadas_base db '',10,13,'Ingrese la ubicacion de su base secreta$'
-pedir_coordenada_x db '',10,13,'Ingrese coordenada x: $'
-pedir_coordenada_y db '',10,13,'Ingrese coordenada y: $'
-mapaArriba db "00..........................WAR GAMES -1983..............................",10,13,"01.......-.....:**:::*=-..-++++:............:--::=WWW***+-++-.............",10,13,"02...:=WWWWWWW=WWW=:::+:..::...--....:=+W==WWWWWWWWWWWWWWWWWWWWWWWW+-.....",10,13,"03..-....:WWWWWWWW=-=WW*.........--..+::+=WWWWWWWWWWWWWWWWWWWW:..:=.......",10,13,"04.......+WWWWWW*+WWW=-:-.........-+*=:::::=W*W=WWWW*++++++:+++=-.........",10,13,"05......*WWWWWWWWW=..............::..-:--+++::-++:::++++++++:--..-........",10,13,"06.......:**WW=*=...............-++++:::::-:+::++++++:++++++++............",10,13,"08........-+:...-..............:+++++::+:++-++::-.-++++::+:::-............",10,13,"09..........--:-...............::++:+++++++:-+:.....::...-+:...-..........",10,13,"$"
+msg_pedir_coordenadas_base db '',10,13,'Ingrese la ubicacion de su base secreta$'
+msg_pedir_coordenada_x db '',10,13,'Ingrese coordenada x: $'
+msg_pedir_coordenada_y db '',10,13,'Ingrese coordenada y: $'
+mapaArriba db "00..........................WAR GAMES -1983...............................",10,13,"01.......-.....:**:::*=-..-++++:............:--::=WWW***+-++-.............",10,13,"02...:=WWWWWWW=WWW=:::+:..::...--....:=+W==WWWWWWWWWWWWWWWWWWWWWWWW+-.....",10,13,"03..-....:WWWWWWWW=-=WW*.........--..+::+=WWWWWWWWWWWWWWWWWWWW:..:=.......",10,13,"04.......+WWWWWW*+WWW=-:-.........-+*=:::::=W*W=WWWW*++++++:+++=-.........",10,13,"05......*WWWWWWWWW=..............::..-:--+++::-++:::++++++++:--..-........",10,13,"06.......:**WW=*=...............-++++:::::-:+::++++++:++++++++............",10,13,"08........-+:...-..............:+++++::+:++-++::-.-++++::+:::-............",10,13,"09..........--:-...............::++:+++++++:-+:.....::...-+:...-..........",10,13,"$"
 mapaAbajo db "10..............-+++:-..........:+::+::++++++:-......-....-...---.........",10,13,"11..............:::++++:-............::+++:+:.............:--+--.-........",10,13,"12..............-+++++++++:...........+:+::+................--.....---....",10,13,"13................:++++++:...........-+::+::.:-................-++:-:.....",10,13,"14.................++::+-.............::++:..:...............++++++++-....",10,13,"15.................:++:-...............::-..................-+:--:++:.....",10,13,"16.................:+-............................................-.....--",10,13,"17.................:....................................................--",10,13,"18.......UNITED STATES.........................SOVIET UNION...............$"
 
 
@@ -562,13 +568,11 @@ coordenada db ?
 
 csa db 0
 
-usa_win_f db 0
-urss_win_f db 0
-
-
 base_urss dw ?
 base_usa dw ?
 
 aux_disparo dw 0
 
-cant_w db 0
+urss_w db 40
+usa_w db 40    
+coordenada_x db 0
