@@ -37,35 +37,72 @@ proc jugar
         call leerCoordenadas
         call disparar
         call informarResultado
-        ;call actualizarSiguienteTurno
+        call actualizarSiguienteTurno
         inc turno
         
+        cmp game_over, 0
+        je INICIO
         
-        jmp INICIO
+        end_game:
     
     ret
 endp
 
 proc informarResultado
     
-    ;call clean_console
+    call clean_console
     
-    MOV DH,25 ; Cursor en el renglon 00
+    MOV DH,19 ; Cursor en el renglon 00
     MOV DL,00 ; Cursor en la columna 19
     call mov_cursor
     
-    ;mov dx, offset urss_w
+    
+    call reset_color
     mov dx, offset msg_informar_resultado
     
-    call print    
+    call print 
     
-    
-    
-    
+    CICLO_inf_res:
+
+        call input_teclado ; carga el valor en al
+        
+        cmp al, 013   ; si es 13 --> enter 
+        jne CICLO_inf_res
 
      ret
 endp     
 
+proc actualizarSiguienteTurno
+    
+    cmp urss_w, 0
+    jle usa_win
+    
+    cmp base_urss, -1
+    je usa_win
+    
+    cmp usa_w, 0
+    jle urss_win
+    
+    cmp base_usa, -1
+    je urss_win
+ 
+    jmp end_actualizar   
+    
+    usa_win:
+    
+        inc game_over
+        jmp end_actualizar
+        
+    urss_win:
+    
+        inc game_over
+    
+    
+    
+    end_actualizar:
+    
+    ret
+endp    
 
 proc disparar
     
@@ -103,7 +140,9 @@ proc disparar
         inc dh;
         jmp ciclo_filas
     
-    end_ciclo_filas:   
+    end_ciclo_filas:
+    
+    call printMap   
 
     ret
 endp
@@ -348,7 +387,8 @@ IMPRIMIR:
     ret
 endp 
 
-proc color_usa
+proc color_usa 
+    
     mov ax, 0600h
     mov bh, 09h
     
@@ -358,7 +398,20 @@ proc color_usa
     
     int 10h
     ret
-endp 
+endp
+
+proc reset_color
+
+    mov ax, 0500h
+    mov bh, 09h
+    
+    MOV CX,1300H ; Se posiciona el cursor en Ren=0 Col=0
+    MOV DX,244FH ; Cursor al final de la pantalla Ren=24(18)
+    
+    
+    int 10h
+    ret
+endp
      
 proc color_urss
     mov ax, 0600h ;config editar pantalla
@@ -636,3 +689,4 @@ usa_w db 40
 coordenada_x db 0
 out_of_range db 0
 msg_informar_resultado db 'informar resultado$'
+game_over db 0
