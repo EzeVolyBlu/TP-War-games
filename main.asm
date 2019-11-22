@@ -7,8 +7,6 @@ programaPrincipal:
     call jugar
     call guardarRanking
     
-  
-    
 ret
 
 proc guardarRanking
@@ -678,8 +676,6 @@ endp
 
 proc printMap
 
-IMPRIMIR:
- 
     mov dh, 00 ; Cursor en el renglon 00
     mov dl, 00 ; Cursor en la columna 00   
     call mov_cursor
@@ -724,7 +720,6 @@ proc color_urss
     
     MOV CX,1300H ; Se posiciona el cursor en Ren=0 Col=0
     MOV DX,244FH ; Cursor al final de la pantalla Ren=24(18)
-    
     
     int 10h
     ret
@@ -777,7 +772,6 @@ proc print
     int 21h
     
     ret
-    
 endp
 
 
@@ -790,10 +784,6 @@ proc mul_input_76
     ret
 endp    
 
-
-
-
-
 proc solo_numeros
     
     cmp AL, '0'
@@ -805,7 +795,6 @@ proc solo_numeros
     mov AH, 2  ; escribe un char en la salida standar
     mov DL, AL
     int 21h 
-    
     
 SALIR: 
     ret
