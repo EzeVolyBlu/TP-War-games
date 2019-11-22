@@ -30,9 +30,12 @@ proc guardarRanking
                                 
     
     open_file:
-
+        
+        xor ax,ax
+        xor dx, dx
+        
         mov al, 2 ;read/write
-        mov dx, offset filename 
+        mov dx, offset filename2 
         mov ah, 3dh ;open file
         
         int 21h ; returns CF clear if succesful, ax = file handle
@@ -66,7 +69,7 @@ proc guardarRanking
     msg_ranking_urss_win:
     
         mov  ah, 40h
-        mov  cx, 5  ;STRING LENGTH.
+        mov  cx, 6  ;STRING LENGTH.
         mov  dx, offset urss
         int  21h
         
@@ -75,7 +78,7 @@ proc guardarRanking
     msg_ranking_usa_win:
     
         mov  ah, 40h
-        mov  cx, 4  ;STRING LENGTH.
+        mov  cx, 5  ;STRING LENGTH.
         mov  dx, offset usa
         int  21h
         
@@ -83,16 +86,23 @@ proc guardarRanking
     duracion_partida:
 
         mov  ah, 40h
-        mov  cx, 28  ;STRING LENGTH.
+        mov  cx, 27  ;STRING LENGTH.
         mov  dx, offset msg_intentos
         int  21h
             
     w_destruidas:
         
         mov  ah, 40h
-        mov  cx, 40  ;STRING LENGTH.
+        mov  cx, 49  ;STRING LENGTH.
         mov  dx, offset msg_urss_w         
         int  21h
+        
+        
+    close_file:
+    
+        mov ah, 3eh
+        mov puntero_archivo, bx
+        int 21h       
     
     ret
 endp    
@@ -863,14 +873,13 @@ endp
 
 
 
-msg_urss_w db 'URSS tiene ',?,?,' espacios',10,13
-msg_usa_w db 'USA tiene ',?,?,' espacios$'
-msg_intentos db 'La partida duro ',?,?,' turnos',10,13,'$'
-msg_error db 'errorrororr$'
+msg_urss_w db 'URSS tiene ',?,?,' espacios',13,10
+msg_usa_w db 'USA tiene ',?,?,' espacios',13,10,13,10,'$'
+msg_intentos db 'La partida duro ',?,?,' turnos',13,10,'$'
 
          
-URSS db 'URSS',10,13,'$'
-USA db 'USA',10,13,'$'
+URSS db 'URSS',13,10,'$'
+USA db 'USA',13,10,'$'
 msg_pedir_coordenadas_base db 'Ingrese la ubicacion de su base secreta$'
 msg_pedir_coordenada_x db '',10,13,'Ingrese coordenada x: $'
 msg_pedir_coordenada_y db '',10,13,'Ingrese coordenada y: $'
@@ -878,7 +887,6 @@ msg_start_urss db 'Empieza disparando URSS$'
 msg_start_usa db 'Empieza disparando USA$'
 msg_turno_urss db 'turno de URSS$'
 msg_turno_usa db 'turno de USA$'
-msg_resultados db 'Resultado$'
 msg_out_of_range db 'Fuera de rango'
 msg_presione_enter db 10,13,10,13,'Presione enter para continuar$'
 msg_usa_win db 'Gano USA',10,13,'$'
@@ -904,6 +912,7 @@ usa_w db 40
 coordenada_x db 0
 out_of_range db 0
 filename db 'ranking.txt'
+filename2 db 'ranking.txt'
 urss_win db 0
 usa_win db 0
 
