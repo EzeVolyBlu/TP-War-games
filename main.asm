@@ -5,11 +5,108 @@ programaPrincipal:
 
     call initJuego
     call jugar
-    ;call guardarRanking
+    call guardarRanking
     
   
     
 ret
+
+proc guardarRanking
+    
+    calcular_intentos:
+    
+        mov dh, turno
+        sub dh, nro_inicio
+        inc dh 
+        
+        xor ah, ah
+        mov al, dh
+        mov bl, 10
+        div bl
+        
+        mov msg_intentos[16],al  
+        mov msg_intentos[17],ah
+        
+        add msg_intentos[16],48  
+        add msg_intentos[17],48
+                                
+    
+    open_file:
+
+        mov al, 2 ;read/write
+        mov dx, offset filename 
+        mov ah, 3dh ;open file
+        
+        int 21h ; returns CF clear if succesful, ax = file handle
+                ; CF set on error -> ax = error code
+                
+        ;jc err
+        mov puntero_archivo, ax
+    
+    
+    read_file:        
+    
+        mov dx, offset buffer	    ; buffer para guardar los datos leidos
+    	mov cx, 699 			            ; por ej. cantidad de bytes a leer
+    	mov bx, puntero_archivo
+    	mov ah, 3Fh, 
+    	int 21h				   ; guarda en ax la cantidad de bytes leidos
+    	;mov cant_bytes,ax
+    	
+    write_file:
+        
+        mov  ah, 40h
+        mov  bx, puntero_archivo
+        mov  cx, 15  ;STRING LENGTH.
+        mov  dx, offset msg_results
+        int  21h
+        
+        cmp usa_win, 0
+        jg msg_ranking_usa_win
+    
+    
+    msg_ranking_urss_win:
+    
+        mov  ah, 40h
+        mov  cx, 5  ;STRING LENGTH.
+        mov  dx, offset urss
+        int  21h
+        
+        jmp duracion_partida
+    
+    msg_ranking_usa_win:
+    
+        mov  ah, 40h
+        mov  cx, 4  ;STRING LENGTH.
+        mov  dx, offset usa
+        int  21h
+        
+    
+    duracion_partida:
+
+        mov  ah, 40h
+        mov  cx, 28  ;STRING LENGTH.
+        mov  dx, offset msg_intentos
+        int  21h
+            
+    w_destruidas:
+        
+        mov  ah, 40h
+        mov  cx, 40  ;STRING LENGTH.
+        mov  dx, offset msg_urss_w         
+        int  21h
+    
+    ret
+endp    
+
+proc write_line
+    
+    
+    ret
+endp    
+
+
+
 
 ;------------------------
 ;       initJuego
@@ -252,6 +349,7 @@ proc elegir_turno
     ;Return: CH = hour CL = minute DH = second DL = 1/100 seconds
     
     mov turno, dh
+    mov nro_inicio, dh 
     ret
 endp      
 
@@ -339,8 +437,7 @@ proc jugar
         
         end_game:
         
-        
-        
+            
     ret
 endp
 
@@ -779,10 +876,13 @@ endp
 
 msg_urss_w db 'URSS tiene ',?,?,' espacios',10,13
 msg_usa_w db 'USA tiene ',?,?,' espacios$'
+msg_intentos db 'La partida duro ',?,?,' turnos',10,13,'$'
+msg_error db 'errorrororr$'
+
          
-URSS db 'URSS$'
-USA db 'USA$'
-msg_pedir_coordenadas_base db '',10,13,'Ingrese la ubicacion de su base secreta$'
+URSS db 'URSS',10,13,'$'
+USA db 'USA',10,13,'$'
+msg_pedir_coordenadas_base db 'Ingrese la ubicacion de su base secreta$'
 msg_pedir_coordenada_x db '',10,13,'Ingrese coordenada x: $'
 msg_pedir_coordenada_y db '',10,13,'Ingrese coordenada y: $'
 msg_start_urss db 'Empieza disparando URSS$'
@@ -801,6 +901,7 @@ msg_base_usa_hit db 'La base de USA fue acertada$',10,13,'$'
 mapaArriba db "00..........................WAR GAMES -1983...............................",10,13,"01.......-.....:**:::*=-..-++++:............:--::=WWW***+-++-.............",10,13,"02...:=WWWWWWW=WWW=:::+:..::...--....:=+W==WWWWWWWWWWWWWWWWWWWWWWWW+-.....",10,13,"03..-....:WWWWWWWW=-=WW*.........--..+::+=WWWWWWWWWWWWWWWWWWWW:..:=.......",10,13,"04.......+WWWWWW*+WWW=-:-.........-+*=:::::=W*W=WWWW*++++++:+++=-.........",10,13,"05......*WWWWWWWWW=..............::..-:--+++::-++:::++++++++:--..-........",10,13,"06.......:**WW=*=...............-++++:::::-:+::++++++:++++++++............",10,13,"08........-+:...-..............:+++++::+:++-++::-.-++++::+:::-............",10,13,"09..........--:-...............::++:+++++++:-+:.....::...-+:...-..........",10,13,
 mapaAbajo db "10..............-+++:-..........:+::+::++++++:-......-....-...---.........",10,13,"11..............:::++++:-............::+++:+:.............:--+--.-........",10,13,"12..............-+++++++++:...........+:+::+................--.....---....",10,13,"13................:++++++:...........-+::+::.:-................-++:-:.....",10,13,"14.................++::+-.............::++:..:...............++++++++-....",10,13,"15.................:++:-...............::-..................-+:--:++:.....",10,13,"16.................:+-............................................-.....--",10,13,"17.................:....................................................--",10,13,"18.......UNITED STATES.........................SOVIET UNION...............$"
 
+nro_inicio db 0
 
 turno db ?
 aux db 10
@@ -813,7 +914,11 @@ urss_w db 40
 usa_w db 40    
 coordenada_x db 0
 out_of_range db 0
-msg_informar_resultado db 'informar resultado$'
-
+filename db 'ranking.txt'
 urss_win db 0
 usa_win db 0
+
+puntero_archivo dw ?
+
+buffer db 700 dup('$')
+msg_results db "El ganador fue $";17

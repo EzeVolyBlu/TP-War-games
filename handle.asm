@@ -28,17 +28,60 @@ read_file:
 	mov bx, puntero_archivo
 	mov ah, 3Fh, 
 	int 21h				   ; guarda en ax la cantidad de bytes leidos
-	mov cant_bytes,ax
+	;mov cant_bytes,ax
 	
+
+
 
 write_file:
     
-    xor dx, dx
     mov  ah, 40h
     mov  bx, puntero_archivo
-    mov  cx, 5  ;STRING LENGTH.
-    mov  dx, offset text
+    mov  cx, 15  ;STRING LENGTH.
+    mov  dx, offset msg_results
     int  21h
+    
+    cmp usa_win, 0
+    jg msg_ranking_usa_win
+    
+    
+    msg_ranking_urss_win:
+    
+        mov  ah, 40h
+        ;mov  bx, puntero_archivo
+        mov  cx, 5  ;STRING LENGTH.
+        mov  dx, offset urss
+        int  21h
+        
+        jmp duracion_partida
+    
+    msg_ranking_usa_win:
+    
+        mov  ah, 40h
+        ;mov  bx, puntero_archivo
+        mov  cx, 4  ;STRING LENGTH.
+        mov  dx, offset usa
+        int  21h
+        
+    
+    duracion_partida:
+    
+        mov al,1
+        mov ah,2
+        
+        
+        mov msg_intentos[16],al  
+        mov msg_intentos[17],ah
+        
+        add msg_intentos[16],48  
+        add msg_intentos[17],48
+               
+        mov  ah, 40h
+        ;mov  bx, puntero_archivo
+        mov  cx, 26  ;STRING LENGTH.
+        mov  dx, offset msg_intentos
+        int  21h
+        
     
 
 	
@@ -64,13 +107,23 @@ k:
 
 ret
 
-filename db "ranking2.txt", 0
+filename db "ranking.txt", 0
 puntero_archivo dw ? 
 error db 0
 buffer db 71 dup('$')
-cant_bytes dw 0
-text db "Adam$"
+;cant_bytes dw 0
 
+msg_intentos db 'La partida duro ',?,?,' turnos',10,13,'$'
+ 
+
+
+msg_results db "El ganador fue $";17
+
+urss db 'urss',10,13
+usa db 'usa',10,13
+
+urss_win db 1
+usa_win db 0
 
 
 
