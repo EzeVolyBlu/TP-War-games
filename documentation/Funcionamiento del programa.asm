@@ -1,6 +1,13 @@
 “War Games” se compone de tres etapas, según se sugiere en las indicaciones del tp.: Iniciar juego, jugar y guardar ranking  
 Se explicará el funcionamiento general del programa utilizando pseudocódigo como assembler. 
 
+ - Procedimientos simples: algunos procedimientos se usan repetidas veces y estan hechos por pocas líneas. Por ej.
+
+    print: 
+        -param: dx offset mensaje
+
+    
+
 org 100h
 programaPrincipal:
 
@@ -16,6 +23,10 @@ proc initJuego:
     - establecer base urss:
         
         mensaje: "Urss ingrese base..." -> todos los mensajes se imprimen con el proc call print ( int 21h / ah = 9 )
+        (dx = mensaje) => {
+            ah = 9
+            int 21h
+          }
         call leerCoordenadas -> se explica al finalizar el proc initJuego
         verificar error de ingreso. ( out_of_range > 0 volver a 'establecer base urss' )
     
