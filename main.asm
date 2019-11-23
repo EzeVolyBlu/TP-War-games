@@ -93,7 +93,7 @@ proc guardarRanking
     w_destruidas:
         
         mov  ah, 40h
-        mov  cx, 49  ;STRING LENGTH.
+        mov  cx, 47  ;STRING LENGTH.
         mov  dx, offset msg_urss_w         
         int  21h
         
@@ -874,7 +874,7 @@ endp
 
 
 msg_urss_w db 'URSS tiene ',?,?,' espacios',13,10
-msg_usa_w db 'USA tiene ',?,?,' espacios',13,10,13,10,'$'
+msg_usa_w db 'USA tiene ',?,?,' espacios',13,10,'$'
 msg_intentos db 'La partida duro ',?,?,' turnos',13,10,'$'
 
          
