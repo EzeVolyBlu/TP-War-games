@@ -888,7 +888,7 @@ msg_start_usa db 'Empieza disparando USA$'
 msg_turno_urss db 'turno de URSS$'
 msg_turno_usa db 'turno de USA$'
 msg_out_of_range db 'Fuera de rango'
-msg_presione_enter db 10,13,10,13,'Presione enter para continuar$'
+msg_presione_enter db 10,13,'Presione enter para continuar$'
 msg_usa_win db 'Gano USA',10,13,'$'
 msg_urss_win db 'Gano URSS',10,13,'$'
 
