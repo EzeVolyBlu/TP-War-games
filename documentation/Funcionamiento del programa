@@ -1,9 +1,0 @@
-“War Games” se compone de tres etapas, según se sugiere en las indicaciones del tp.: Iniciar juego, jugar y guardar ranking  
-
-org 100h
-programaPrincipal:
-    call initJuego 
-    call jugar
-    call guardarRanking
-ret
-
