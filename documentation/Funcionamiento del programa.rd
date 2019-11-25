@@ -18,7 +18,7 @@ Se explicará el funcionamiento general del programa utilizando pseudocódigo co
 - Variables globales (posiciones de memoria).
  
     w_usa = 40
-    w_urss = 40 ; Aclaración: en principio se desarrolló un metodo que al iniciar el juego contaba las W en el mapa (está en carpeta                       borradores 'count_W ok'). Se descartó el mismo porque insumía un tiempo considerable de ejecución y además arrojaba                     una desventaja (w_urss = 54 , w_usa = 40). Por tanto se decidió asignarle a cada uno 40 W.   
+    w_urss = 40 ; Aclaración: en principio se desarrolló un metodo que al iniciar el juego contaba las W en el mapa (está en carpeta borradores 'count_W ok'). Se descartó el mismo porque insumía un tiempo considerable de ejecución y además arrojaba una desventaja (w_urss = 54 , w_usa = 40). Por tanto se decidió asignarle a cada uno 40 W.   
 
     base_urss = ? : toma el valor de un punto único en el mapa
     base_usa = ? : idem anterior
@@ -27,7 +27,7 @@ Se explicará el funcionamiento general del programa utilizando pseudocódigo co
    
     turno = ? ; tomará un valor aleatorio y luego se irá incrementando por cada turno.  
     
-    nro_inicio = ? ; guardará el valor aleatorio original. cuando termina la partida se usa para conocer el número de jugadas (turno -                        nro_inicio) 
+    nro_inicio = ? ; guardará el valor aleatorio original. cuando termina la partida se usa para conocer el número de jugadas (turno - nro_inicio) 
     
     coordenada_x = 0; se le asignará valor con cada proc leerCoordenadas. se utiliza para saber a qué jugador restarle W
     
@@ -129,7 +129,7 @@ endp
         endp
               Cuando csa > 3 los switches y csa no tienen más utilidad, el programa se ocupará de saltarlos.
 
-       proc input_coordenadas se encarga de convertir 2 ingresos de teclado en un número de 2 dígitos. Su funcionamiento es el                  siguiente:
+       proc input_coordenadas se encarga de convertir 2 ingresos de teclado en un número de 2 dígitos. Su funcionamiento es el siguiente:
 
         Ingreso_1: (ej '4' -> ret 40)
 
@@ -201,7 +201,7 @@ proc disparar: consiste en tomar el punto dado en coordenada_unica y junto a tod
 
   BX = coordenada_unica (el punto q retorna leerCoordenadas)
   BX = BX - 77 
-       (cada fila tiene 76 caractéres, por tanto - 77 posiciona en la fila anterior y columna anterior. Esta sería la 1er posición de la         matriz de 3x3.
+       (cada fila tiene 76 caractéres, por tanto - 77 posiciona en la fila anterior y columna anterior. Esta sería la 1er posición de la matriz de 3x3.
         
   for (ciclos_filas < 3){
 
@@ -247,7 +247,7 @@ proc informarResultado:
     
     informar_w: 
        
-        call convert_w_to_number : este proceso convierte la cifra de W de cada jugador en 2 cifras ascii y devuelve un mensaje como                                        "urss tiene 25 espacios. usa tiene 30 espacios" . Debajo se detallará su funcionamiento 
+        call convert_w_to_number : este proceso convierte la cifra de W de cada jugador en 2 cifras ascii y devuelve un mensaje como "urss tiene 25 espacios. usa tiene 30 espacios" . Debajo se detallará su funcionamiento 
         call print: imprime el mensaje anterior 
     
         
@@ -276,7 +276,13 @@ endp
         
 proc convert_w_to_number:
         
-        
+     al = urss_w ; cargamos la cantidad de w de un jugador en al. ej.: 35
+     al = al / 10 --> 3
+     ah = resto --> 5
+     
+     ; luego insertamos los valores en un mensaje:
+        "urss tiene ",[al],[ah]," w" --> "urss tiene 35 w"
+     
            
             
         
