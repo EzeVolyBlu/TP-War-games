@@ -1,3 +1,8 @@
+Mejoras del programa:
+ - se eliminó el error que ocurría cuando un disparo quitaba un salto de línea.
+ - la versión presentada no creaba un archivo, había que hacerlo 'manualmente'. Ahora si no hay archivo lo crea con el directorio.
+ - se quitaron procedimientos innecesarios para hacer más legible el código
+
 “War Games” se compone de tres etapas, según se sugiere en las indicaciones del tp.: Iniciar juego, jugar y guardar ranking  
 Se explicará el funcionamiento general del programa utilizando pseudocódigo como assembler. 
 
@@ -279,15 +284,58 @@ proc convert_w_to_number:
      al = urss_w ; cargamos la cantidad de w de un jugador en al. ej.: 35
      al = al / 10 --> 3
      ah = resto --> 5
-     
-     ; luego insertamos los valores en un mensaje:
+     al = al + 48 ; así lo convertimos en su valor correspondiente ascii
+     ah = ah + 48
+        
+     ;  insertamos los valores en un mensaje:
         "urss tiene ",[al],[ah]," w" --> "urss tiene 35 w"
      
-           
+     ; luego repetimos la operación con el otro jugador      
             
+    ret
+endp        
+
+3 - proc guardarRanking
         
-
-
+        ; primero obtenemos el n° de jugadas (turno - nro_inicio) de la partida
+        ; al igual que el proc anterior lo convertimos a ascii (div / 10 + 48 )
+        ; insertamos los valores en un mensaje: "la partida duró [] turnos"
+        
+        Manejo de archivos:
+        
+        open_file: (int 21h / ah = 3dh)
+           abre el archivo 'ranking.txt'
+           if(error){
+              saltar a create_file:
+                 crea el directorio si no existe (int 21h / ah = 39h)
+                 crea el archivo 'ranking.txt' (int 21h / ah = 3ch)
+            }
+            
+        read_file: (int 21h / ah = 3fh)
+        
+        if (usa_win){
+            write_file: (int 21h / ah = 40h)
+               "el ganador es usa"
+         } else {
+            write_file:
+             "el ganador es urss"
+         }
+        
+         write_file: 
+           "la partida duró [] intentos"
+         
+        write_file: 
+           "urss tiene [] w"
+           "usa tiene [] w"
+        
+        close_file: (int 21h / ah = 3eh)
+        
+        ret
+endp
+         
+        
+           
+         
 
         
         
