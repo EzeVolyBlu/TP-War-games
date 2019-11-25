@@ -3,8 +3,8 @@ org 100h
 programaPrincipal:
 
 
-    call initJuego
-    call jugar
+    ;call initJuego
+    ;call jugar
     call guardarRanking
     
 ret
@@ -30,7 +30,7 @@ proc guardarRanking
     
     jmp open_file
                                 
-    no_file:
+    create_file:
     
         mov dx, offset dir1
         mov ah, 39h
@@ -53,7 +53,7 @@ proc guardarRanking
         int 21h ; returns CF clear if succesful, ax = file handle
                 ; CF set on error -> ax = error code
                 
-        jc no_file
+        jc create_file
         mov puntero_archivo, ax
     
     
@@ -61,14 +61,15 @@ proc guardarRanking
     
     
     read_file:        
-    
+        
         mov dx, offset buffer	    ; buffer para guardar los datos leidos
     	mov cx, 699 			            ; por ej. cantidad de bytes a leer
     	mov bx, puntero_archivo
     	mov ah, 3Fh, 
     	int 21h				   ; guarda en ax la cantidad de bytes leidos
     	;mov cant_bytes,ax
-    	
+
+        
     write_file:
         
         mov  ah, 40h
@@ -785,7 +786,7 @@ endp
 proc convert_w_to_number
     
     convert_w_to_number_urss: 
-    
+                        
         xor ah, ah
         mov al, urss_w
         mov bl, 10
