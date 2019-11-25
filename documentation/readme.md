@@ -1,3 +1,9 @@
+TP War Games
+Organización del computador (turno noche)
+Universidad Nacional General Sarmiento
+Alumno: Ezequiel Voly Blumenfeld
+
+
 Mejoras del programa:
  - se eliminó el error que ocurría cuando un disparo quitaba un salto de línea.
  - la versión presentada no creaba un archivo, había que hacerlo 'manualmente'. Ahora si no hay archivo lo crea con el directorio.
@@ -307,7 +313,7 @@ endp
            abre el archivo 'ranking.txt'
            if(error){
               saltar a create_file:
-                 crea el directorio si no existe (int 21h / ah = 39h)
+                 crea el directorio 'C:/War Games' si no existe (int 21h / ah = 39h)
                  crea el archivo 'ranking.txt' (int 21h / ah = 3ch)
             }
             
