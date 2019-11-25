@@ -1,7 +1,7 @@
-TP War Games
-Organización del computador (turno noche)
-Universidad Nacional General Sarmiento
-Alumno: Ezequiel Voly Blumenfeld
+TP War Games <br>
+Organización del computador (turno noche) <br>
+Universidad Nacional General Sarmiento <br>
+Alumno: Ezequiel Voly Blumenfeld <br>
 
 
 Mejoras del programa:
@@ -56,9 +56,9 @@ Se explicará el funcionamiento general del programa utilizando pseudocódigo co
 org 100h
 programaPrincipal:
 
-   1 call initJuego 
-   2 call jugar
-   3 call guardarRanking
+   1 call initJuego <br>
+   2 call jugar <br>
+   3 call guardarRanking <br>
     
 ret
 
