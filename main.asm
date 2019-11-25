@@ -27,7 +27,19 @@ proc guardarRanking
         
         add msg_intentos[16],48  
         add msg_intentos[17],48
+    
+    jmp open_file
                                 
+    no_file:
+    
+        mov dx, offset dir1
+        mov ah, 39h
+        int 21h
+
+        mov ah, 3ch
+        mov cx, 0
+        mov dx, offset filename2
+        int 21h
     
     open_file:
         
@@ -41,8 +53,11 @@ proc guardarRanking
         int 21h ; returns CF clear if succesful, ax = file handle
                 ; CF set on error -> ax = error code
                 
-        ;jc err
+        jc no_file
         mov puntero_archivo, ax
+    
+    
+    
     
     
     read_file:        
@@ -97,9 +112,13 @@ proc guardarRanking
         mov  dx, offset msg_urss_w         
         int  21h
         
-        
     close_file:
-    
+        
+        mov  ah, 40h
+        mov  cx, 2  ;STRING LENGTH.
+        mov  dx, offset line
+        int  21h
+        
         mov ah, 3eh
         mov puntero_archivo, bx
         int 21h       
@@ -107,11 +126,6 @@ proc guardarRanking
     ret
 endp    
 
-proc write_line
-    
-    
-    ret
-endp    
 
 
 
@@ -133,7 +147,10 @@ proc initJuego
         call color_urss
         mov dx, offset URSS
         call print
-        call establecerBase
+    
+        mov dx, offset msg_pedir_coordenadas_base 
+        call print
+        call leerCoordenadas
         
         
         cmp out_of_range, 0
@@ -152,26 +169,41 @@ proc initJuego
         call color_usa
         mov dx, offset USA
         call print
-        call establecerBase  
-    
+
+        mov dx, offset msg_pedir_coordenadas_base 
+        call print
+        call leerCoordenadas
+        
         cmp out_of_range, 0
         jg  establecer_base_usa
+
     
-    call elegir_turno
+    elegir_turno:
     
-    call informar_quien_empieza
-    
+        mov ah,2Ch 
+        int 21h 
+        ;Return: CH = hour CL = minute DH = second DL = 1/100 seconds
+        
+        mov turno, dh
+        mov nro_inicio, dh 
+
+        ;call press_enter           
+        
+            
     ret
 endp    
 
-proc establecerBase
+proc press_enter
+
+    ciclo_enter:
     
-    mov dx, offset msg_pedir_coordenadas_base 
-    call print
-    call leerCoordenadas
+        call input_teclado
+        cmp al, 013   ; si es 13 --> enter  
+        jne ciclo_enter
     
     ret
 endp
+
 
 proc leerCoordenadas
     
@@ -282,19 +314,18 @@ proc leerCoordenadas
         call color_error
         mov dx, offset msg_out_of_range
         call print
-    
-        ciclo_enter:       
         
-            call input_teclado ; carga el valor en al
-            cmp al, 013   ; si es 13 --> enter  
-            jne ciclo_enter
-            
-            call clean_console
+        mov dx, offset msg_presione_enter
+        call print    
     
-            MOV DH,19 ; Cursor en el renglon 00
-            MOV DL,00 ; Cursor en la columna 19
-            call mov_cursor
-                
+        call press_enter
+            
+        call clean_console
+
+        MOV DH,19 ; Cursor en el renglon 00
+        MOV DL,00 ; Cursor en la columna 19
+        call mov_cursor
+            
     
     ok:   
     
@@ -309,7 +340,6 @@ proc input_coordenadas
     INGRESO_1:
 
         call input_teclado
-        ;call solo_numeros 
         
         cmp al, '0'
         jb INGRESO_1
@@ -341,71 +371,12 @@ proc input_coordenadas
         
         call sumar_segundo_dec
         
-        wait_enter:
-            
-            call input_teclado
-            cmp al, 013   ; si es 13 --> enter  
-            jne wait_enter
+        call press_enter
+        
    ret
     
 endp
 
-proc elegir_turno
-    
-    mov ah,2Ch 
-    int 21h 
-    ;Return: CH = hour CL = minute DH = second DL = 1/100 seconds
-    
-    mov turno, dh
-    mov nro_inicio, dh 
-    ret
-endp      
-
-proc informar_quien_empieza
-    
-    call clean_console
-    
-    MOV DH,19 ; Cursor en el renglon 00
-    MOV DL,00 ; Cursor en la columna 19
-    call mov_cursor
-    
-    
-    call revisa_paridad ; param turno; resto = ah
-    cmp ah, 0
-    
-    je PAR; resto = 0 -> par 
-    
-        IMPAR: ;Estados Unidos     
-            
-            call color_usa
-            mov dx, offset msg_start_usa
-            jmp END 
-        
-        
-        
-        PAR: ;Union Sovietica
-        
-            call color_urss
-            mov dx, offset msg_start_urss
-            
-        
-    
-        END:                  
-             
-            call print   
-            
-        
-        mov dx, offset msg_presione_enter
-        call print    
-            
-        press_enter:
-            
-            call input_teclado
-            cmp al, 013   ; si es 13 --> enter  
-            jne press_enter           
-            
-    ret
-endp    
 
 ;-----------------------------------------
 ;               jugar
@@ -419,13 +390,13 @@ proc jugar
                  
         call printMap
         
-        again:
+        control:
         
             call informarPaisTurno
             call leerCoordenadas
         
         cmp out_of_range, 0
-        jg again
+        jg control
         
         call disparar
         call informarResultado
@@ -457,13 +428,21 @@ proc informarResultado
     MOV DL,00 ; Cursor en la columna 19
     call mov_cursor
     
+    informar_w:
+    
+        call convert_w_to_number
+        mov dx, offset msg_urss_w ;imprime los 2 
+        call print
+    
+    
+    
     cmp base_urss, -1
     je base_urss_hit
     
     cmp base_usa, -1
     je base_usa_hit
     
-    jmp informar_w
+    jmp count_w
     
     base_urss_hit:
     
@@ -474,7 +453,7 @@ proc informarResultado
         mov dx, offset msg_usa_win    
         call print
         
-        jmp informar_w
+        jmp urss_lost
         
     base_usa_hit:
     
@@ -483,12 +462,7 @@ proc informarResultado
         
         mov dx, offset msg_urss_win    
         call print
-    
-    informar_w:
-    
-        call convert_w_to_number
-        mov dx, offset msg_urss_w ;imprime los 2 
-        call print
+        jmp usa_lost
         
     count_w:       
     
@@ -503,11 +477,9 @@ proc informarResultado
         urss_lost:
         
             inc usa_win
-            jmp end_informar_resultado
-            
             mov dx, offset msg_usa_win    
             call print
-        
+            jmp end_informar_resultado
             
             
         usa_lost:
@@ -520,18 +492,12 @@ proc informarResultado
             
 
     end_informar_resultado:
-    
+        
         mov dx, offset msg_presione_enter
-        call print
+        call print    
+       
+        call press_enter
         
-    
-    CICLO_inf_res:
-        
-        call input_teclado ; carga el valor en al
-        
-        cmp al, 013   ; si es 13 --> enter 
-        jne CICLO_inf_res
-
      ret
 endp     
 
@@ -550,10 +516,59 @@ proc disparar
         xor dl, dl   ; columnas    
         ciclo_columnas:
         
-            call check_bases
-            call check_w
-            call remove_w
+            check_bases:
+
+                cmp base_urss, bx
+                je destroy_urss_base
+                
+                
+                cmp base_usa, bx
+                je destroy_usa_base
+                
+                jmp end_check_bases
+                
+                destroy_urss_base:
+                
+                    mov base_urss, -1
+                    jmp end_check_bases
+                    
+                destroy_usa_base:       
+                    
+                    mov base_usa, -1
+                    
+                end_check_bases:   
+                
             
+            cmp mapaArriba[bx], 13
+            je no_remove
+            
+            cmp mapaArriba[bx], 10
+            je no_remove
+                
+            check_w:
+                
+                cmp mapaArriba[bx], 'W'
+                jne end_count_w
+                
+                cmp coordenada_x, 33
+                jl sub_usa_w
+                
+                    sub_urss_w:
+                    
+                        dec urss_w 
+                        jmp end_count_w
+                        
+                    sub_usa_w:
+                    
+                        dec usa_w 
+                    
+                end_count_w:
+            
+            remove_w:
+            
+                mov mapaArriba[bx], " "
+    
+            no_remove:
             
             cmp dl, 2
             je end_ciclo_columnas
@@ -561,7 +576,7 @@ proc disparar
             inc bx
             inc dl
             jmp ciclo_columnas
-            
+                
         end_ciclo_columnas:    
                                      
         
@@ -578,63 +593,6 @@ proc disparar
 
     ret
 endp
-         
-proc remove_w
-    
-    mov mapaArriba[bx], " "
-    
-    ret
-endp             
-         
-         
-proc check_w
-    
-    cmp mapaArriba[bx], 'W'
-    jne end_count_w
-    
-    cmp coordenada_x, 30
-    jl sub_usa_w
-    
-        sub_urss_w:
-        
-            dec urss_w 
-            jmp end_count_w
-            
-        sub_usa_w:
-        
-            dec usa_w 
-        
-    end_count_w:
-
-    ret
-endp    
-
-
-proc check_bases
-    
-    cmp base_urss, bx
-    je destroy_urss_base
-    
-    
-    cmp base_usa, bx
-    je destroy_usa_base
-    
-    jmp end_check_bases
-    
-    destroy_urss_base:
-    
-        mov base_urss, -1
-        jmp end_check_bases
-        
-    destroy_usa_base:       
-        
-        mov base_usa, -1
-        
-    end_check_bases:   
-    
-    ret
-endp    
-
  
 proc informarPaisTurno
     
@@ -794,22 +752,6 @@ proc mul_input_76
     ret
 endp    
 
-proc solo_numeros
-    
-    cmp AL, '0'
-    jb SALIR
-    
-    cmp AL, '9'
-    ja SALIR
-    
-    mov AH, 2  ; escribe un char en la salida standar
-    mov DL, AL
-    int 21h 
-    
-SALIR: 
-    ret
-endp  
-
      
 proc input_teclado
     
@@ -876,7 +818,8 @@ endp
 msg_urss_w db 'URSS tiene ',?,?,' espacios',13,10
 msg_usa_w db 'USA tiene ',?,?,' espacios',13,10,'$'
 msg_intentos db 'La partida duro ',?,?,' turnos',13,10,'$'
-
+        
+line db 13,10,'$'
          
 URSS db 'URSS',13,10,'$'
 USA db 'USA',13,10,'$'
@@ -911,8 +854,12 @@ urss_w db 40
 usa_w db 40    
 coordenada_x db 0
 out_of_range db 0
-filename db 'ranking.txt'
-filename2 db 'ranking.txt'
+dir1 db "c:\War Games", 0
+filename2 db "c:\war games\Ranking.txt", 0
+
+
+
+
 urss_win db 0
 usa_win db 0
 
